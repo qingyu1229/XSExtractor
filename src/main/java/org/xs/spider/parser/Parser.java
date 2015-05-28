@@ -41,7 +41,7 @@ public interface Parser {
      * @param regStrs
      * @return
      */
-    public String removeNeedlessChars(List<String> regStrs);
+    public String removeNeedlessChars(List<String> regStrs,String contentStr);
 
     /**
      * 移除尾部杂质
