@@ -38,18 +38,16 @@ public interface Parser {
 
     /**
      * 按照正则移除正文中多余的部分
-     * @param regStrs
      * @return
      */
-    public String removeNeedlessChars(List<String> regStrs,String contentStr);
+    public String removeNeedlessChars(String contentStr);
 
     /**
      * 移除尾部杂质
      * @param contentStr
-     * @param tailStr
      * @return
      */
-    public String removeTails(String contentStr,String tailStr);
+    public String removeTails(String contentStr);
 
     /**
      * 将contentStr重新格式化为Element
@@ -65,5 +63,20 @@ public interface Parser {
      */
     public String getContent(Document document);
 
+    /**
+     * 获取正文Element
+     * @param document
+     * @return
+     */
+    public Element getContentEle(Document document);
+
+    /**
+     * 获取正文文本（不包含Html标签）
+     * @param document
+     * @return
+     */
+    public String getContentText(Document document);
+
+    public String getContentPath();
 
 }
