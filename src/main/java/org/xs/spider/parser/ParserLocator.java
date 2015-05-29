@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 /**
  * Created by Administrator on 15-5-27.
+ * 使用对象定位器模式管理各类Parser
  */
 public class ParserLocator {
 

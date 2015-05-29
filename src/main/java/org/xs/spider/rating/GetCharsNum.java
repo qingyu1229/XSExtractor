@@ -36,11 +36,6 @@ public class GetCharsNum
 		map.put("chCharacter", chCharacter);
 		map.put("chPunctuationCharacter", chPunctuationCharacter);
 		map.put("otherCharacter", otherCharacter);
-		/*
-		 * System.out.println("中文个数有--" + chCharacter);
-		 * System.out.println("中文标点个数有--" + chPunctuationCharacter);
-		 * System.out.println("其他字符个数有--" + otherCharacter);
-		 */
 
 		return map;
 	}

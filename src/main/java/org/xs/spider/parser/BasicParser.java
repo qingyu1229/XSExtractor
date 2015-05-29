@@ -4,21 +4,28 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.xs.spider.Fetcher.BasicImgFetcher;
+import org.xs.spider.Fetcher.ImgFetcher;
 import org.xs.spider.rating.Rating;
 
 import java.util.List;
 
 /**
  * Created by Administrator on 15-5-27.
+ * 默认的通用解析器
  */
 public class BasicParser implements Parser {
 
+    /**
+     * 移除Document中的杂质
+     * @param document
+     * @return
+     */
     @Override
     public Document denoiseForDoc(Document document) {
         document.getElementsByTag("script").remove();
         document.getElementsByTag("style").remove();
         document.getElementsByTag("link").remove();
-        document.getElementsByTag("img").remove();
         document.getElementsByTag("input").remove();
         document.getElementsByTag("object").remove();
         document.getElementsByTag("textarea").remove();
@@ -29,6 +36,11 @@ public class BasicParser implements Parser {
         return document;
     }
 
+    /**
+     * 定位正文部分的Element
+     * @param document
+     * @return
+     */
     @Override
     public Element excavateContent(Document document) {
         Element body = document.body();
@@ -37,16 +49,38 @@ public class BasicParser implements Parser {
         return contentElement.parent();
     }
 
+    /**
+     * 从定位到的正文Element中进行再次去噪
+     * @param contentElement
+     */
     @Override
     public void denioseForContentElement(Element contentElement) {
 
     }
 
+    /**
+     * 下载图片（由于需要相应的Fetcher，目前尚未实现）
+     * @param contentElement
+     */
     @Override
     public void downloadImg(Element contentElement) {
-
+        Elements imgElements= contentElement.getElementsByTag("img");
+        if(imgElements==null){
+            return;
+        }
+        ImgFetcher fetcher=new BasicImgFetcher();
+        for(Element element:imgElements){
+            String url= element.attr("src");
+            String localImgUrl= fetcher.fetch(url);
+            element.attr("src",localImgUrl);
+        }
     }
 
+    /**
+     * 将正文的Element转换为String类型后，使用正则进行再次降噪，移除正文部分通常不需要的注释、来源网站、作者、版权声明等
+     * @param contentStr
+     * @return
+     */
     @Override
     public String removeNeedlessChars(String contentStr) {
         String stockCodes[] = new String[]{
@@ -83,6 +117,11 @@ public class BasicParser implements Parser {
         return contentStr;
     }
 
+    /**
+     * 移除文章末尾的免责声明、推荐阅读等内容
+     * @param contentStr
+     * @return
+     */
     @Override
     public String removeTails(String contentStr) {
         String[] tails = new String[]{"【免责声明", "【版权声明", "【重点推荐", "【延伸阅读",
@@ -96,11 +135,18 @@ public class BasicParser implements Parser {
         return contentStr;
     }
 
+    /**
+     * 由于前两步的操作可能破坏Html标签
+     * 这一步操作将对正文进行格式化为标准的Html片段
+     * @param contentStr
+     * @return
+     */
     @Override
     public Element format(String contentStr) {
         Document doc= Jsoup.parse(contentStr);
-        return doc.body();
+        return doc.body().child(0);
     }
+
 
     @Override
     public String getContent(Document document) {
@@ -136,6 +182,7 @@ public class BasicParser implements Parser {
         boolean hasText = element.hasText();
         if (!hasText) {//如果节点没有内容
             element.attr("score", "0");
+            //element.remove();
             return 0;
         } else {
             Elements children = element.children();
@@ -178,23 +225,28 @@ public class BasicParser implements Parser {
     }
 
     public Element getMaxScoreChild(Element element) {
-        if (element.childNodeSize() == 0) {
-            return null;
+        if(element.childNodeSize()==0){
+            return element;
         }
-        Elements children = element.children();
-        Element maxScoreElement = null;
-        int score = 0;
-        for (Element e : children) {
-            String strScore = e.attr("score");
-            if (strScore == null) {
+        Elements children=element.children();
+        if(children==null||children.size()==0){
+            return element;
+        }
+        //System.out.println(children.size());
+        Element maxScoreElement=children.first();
+        int score=0;
+        for(Element e:children){
+            //System.out.println(e.tagName());
+            String strScore=e.attr("score");
+            if(strScore==null){
                 continue;
             }
-            if (Integer.valueOf(strScore) > score) {
-                maxScoreElement = e;
-                score = Integer.valueOf(strScore);
+            if(Integer.valueOf(strScore)>score){
+                maxScoreElement=e;
+                score=Integer.valueOf(strScore);
             }
         }
-        return maxScoreElement;
+        return getMaxScoreChild(maxScoreElement);
     }
 
 }

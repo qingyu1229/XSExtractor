@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * Created by Administrator on 15-5-27.
+ * 解析器接口
  */
 public interface Parser {
 
