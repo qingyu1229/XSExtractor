@@ -46,4 +46,33 @@ public class Rating
 		
 		return s;
 	}
+
+	public static int doOwnTextRate(Element element){
+		Map<String,Integer> map=new HashMap<String,Integer>();
+		int s=0;
+
+		String textString= element.ownText();
+
+		/**
+		 * 获取各种字符的个数
+		 */
+		map=GetCharsNum.getNum(textString);
+
+		int chCharacter=map.get("chCharacter");
+		int chPunctuationCharacter=map.get("chPunctuationCharacter");
+		int otherCharacter=map.get("otherCharacter");
+
+		//计算得分
+		s=chCharacter* Properties.CNCHARSCORE
+				+chPunctuationCharacter* Properties.CNPNCHARSCORE
+				+otherCharacter/5;
+
+		/*System.out.println("中文个数有--" + chCharacter);
+		System.out.println("中文标点个数有--" + chPunctuationCharacter);
+		System.out.println("其他字符个数有--" + otherCharacter);*/
+		element.attr("score", String.valueOf(s));
+
+		return s;
+	}
+
 }
