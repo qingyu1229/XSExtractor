@@ -1,6 +1,7 @@
 package org.xs.spider.parser;
 
 import org.jsoup.Jsoup;
+import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -48,11 +49,25 @@ public class BasicParser implements Parser {
     public Element excavateContent(Document document) {
         Element body = document.body();
         doScoreToElement(body);
-        Element contentElement = getMaxScoreChild(body);
+        Element maxScoreElement = getMaxScoreChild(body);
 
+        StringBuffer buffer=new StringBuffer();
+        StringBuffer pathBuffer= checkPath(maxScoreElement,buffer,document);
+        String path=pathBuffer.toString();
 
+        if(path.contains(">p>")){
+            path= path.split(">p>")[0];
+        }
 
-        return contentElement.parent();
+        if(path.endsWith(">")){
+            path=path.substring(0, path.length()-1);
+        }
+        if(path.endsWith(">p")){
+            path=path.substring(0, path.length()-2);
+        }
+        System.out.println(path);
+        Element contentElement=body.select(path).first();
+        return contentElement;
     }
 
     /**
@@ -155,13 +170,15 @@ public class BasicParser implements Parser {
     @Override
     public Element format(String contentStr) {
         Document doc = Jsoup.parse(contentStr);
-        return doc.body().child(0);
+        return doc.body();
     }
-
 
     @Override
     public String getContent(Document document) {
-        return getContentEle(document).toString();
+        String contentStr=getContentEle(document).toString();
+        contentStr= contentStr.replace("<body>","");
+        contentStr= contentStr.replace("</body>","");
+        return contentStr;
     }
 
     @Override
@@ -204,29 +221,54 @@ public class BasicParser implements Parser {
         }
     }
 
+    private StringBuffer checkPath(Element element, StringBuffer accum,Document document) {
+        if (element == null) {
+            return accum;
+        }
+        if(element.parent()==null){
+            return accum;
+        }
 
-    public StringBuffer checkElementPath(Element element, StringBuffer strAccum) {
-        Element maxScoreElement = getMaxScoreChild(element);
-        if (maxScoreElement == null) {
-            return strAccum;
-        } else {
-            String tagName = maxScoreElement.tagName();
-            boolean hasIdAttr = maxScoreElement.hasAttr("id");//是否含有id属性
-            boolean hashClassAttr = maxScoreElement.hasAttr("class");//是否含有class属性
-            strAccum.append(tagName);
-            if (hasIdAttr) {//优先考虑id属性
-                strAccum.append("#" + maxScoreElement.attr("id"));
-                return strAccum;
-            } else if (hashClassAttr) {//如果包含class属性
-                String classAttr = maxScoreElement.attr("class").trim().replace(" ", ".");
-                strAccum.append("." + classAttr);
-                if (element.getElementsByClass(classAttr).size() == 1) {
-                    return strAccum;
+        if (element.parent() != null) {
+            Element parentElement = element.parent();
+            String tagStr = parentElement.tagName();
+            // 如果能够找到带有ID属性的父节点就停止查找
+            if (parentElement.hasAttr("id")) {
+                accum.insert(0, tagStr + "#" + parentElement.attr("id") + ">");
+            } else if (parentElement.hasAttr("class")) {
+                String classStr =parentElement.attr("class").trim().replace(" ", ".");
+                //System.out.println("accum:"+accum);
+                /**
+                 * 不考虑P标签的class属性
+                 */
+                if("p".equals(tagStr)){
+                    classStr="";
+                }
+
+                if(!"".equals(classStr)){
+                    accum.insert(0, tagStr +"."+ classStr +   ">");
+                }else{
+                    accum.insert(0, tagStr + ">");
+                }
+
+                /**
+                 * 判断class是否唯一
+                 * 如果是P标签，则往上查找
+                 */
+                if ("p".equals(tagStr)||document.getElementsByClass(classStr).size() > 1) {
+                    accum= checkPath(element.parent(),accum,document);
+                }else{
+                    return accum;
+                }
+
+            } else {
+                accum.insert(0,tagStr+">");
+                if(!"body".equals(tagStr)){
+                    accum= checkPath(element.parent(),accum,document);
                 }
             }
-            strAccum.append(">");
-            return checkElementPath(maxScoreElement, strAccum);
         }
+        return accum;
     }
 
     public Element getMaxScoreChild(Element element) {

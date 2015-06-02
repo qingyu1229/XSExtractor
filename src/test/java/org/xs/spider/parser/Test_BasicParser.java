@@ -21,20 +21,16 @@ public class Test_BasicParser {
     public void test1() {
         //http://www.cbrhq.gov.cn/Item/13014.aspx
 
-        String url = "http://www.ycxixia.gov.cn/zwxj/zwyw/bmdt/322849.shtml";
+        String url = "http://www.cbrhq.gov.cn/Item/13014.aspx";
         try {
             Document document = Jsoup.connect(url).get();
             BasicParser parser = new BasicParser();
             String content = parser.getContent(document);
-
             FileUtils.write(new File("d:/textContent.html"), content, "gbk");
-
             System.out.println(content);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
     @Test
