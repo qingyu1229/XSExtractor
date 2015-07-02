@@ -21,7 +21,11 @@ public class Test_BasicParser {
     public void test1() {
         //http://www.cbrhq.gov.cn/Item/13014.aspx
 
-        String url = "http://www.cbrhq.gov.cn/Item/13014.aspx";
+        //http://www.edai.com/news/xuetang/138124.html  抓取了多余的上一页下一页标签
+        //
+
+
+        String url = "http://www.edai.com/news/xuetang/138124.html";
         try {
             Document document = Jsoup.connect(url).get();
             BasicParser parser = new BasicParser();

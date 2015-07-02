@@ -150,7 +150,7 @@ public class BasicParser implements Parser {
     @Override
     public String removeTails(String contentStr) {
         String[] tails = new String[]{"【免责声明", "【版权声明", "【重点推荐", "【延伸阅读",
-                "【推荐阅读", "【相关阅读", "免责声明", "版权声明", "【更多详情", "【相关专题"};
+                "【推荐阅读", "【相关阅读", "免责声明", "版权声明", "【更多详情", "【相关专题","上一篇：","下一篇："};
         for (String string : tails) {
             int index = contentStr.indexOf(string);
             if (index > 0) {
@@ -207,7 +207,6 @@ public class BasicParser implements Parser {
     }
 
     private int doScoreToElement(Element element) {
-
         Elements children = element.children();
         if (children.size() == 0) {//不含有子节点
             return Rating.doRate(element);
