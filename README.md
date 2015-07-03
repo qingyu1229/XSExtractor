@@ -32,20 +32,21 @@ XSExtractor是我从采集系统中分离出来的抽取器（做了一些改变
 博客地址：[liangqingyu.com](http://www.liangqingyu.com)）。Html页面采用Jsoup进行格式化和结构化。希望能够帮助一部分人。
 具体使用方法：
 >
-//Document document = Jsoup.connect(url).get();
-//OR
-//Document document = Jsoup.parse(htmlStr);
-BasicParser parser = new BasicParser();
-String content = parser.getContent(document);
-//String text=parser.getContentText(document); //获取纯文本
-或者：
+    //Document document = Jsoup.connect(url).get();
+    //OR
+    //Document document = Jsoup.parse(htmlStr);
+    BasicParser parser = new BasicParser();
+    String content = parser.getContent(document);
+    //String text=parser.getContentText(document); //获取纯文本
+
+  或者：
 >
-//Document document = Jsoup.connect(url).get();
-//OR
-//Document document = Jsoup.parse(htmlStr);
-Parser parser= ParserLocator.getInstance().getParser(url);
-String content = parser.getContent(document);
-//String text=parser.getContentText(document); //获取纯文本
+    //Document document = Jsoup.connect(url).get();
+    //OR
+    //Document document = Jsoup.parse(htmlStr);
+    Parser parser= ParserLocator.getInstance().getParser(url);
+    String content = parser.getContent(document);
+    //String text=parser.getContentText(document); //获取纯文本
 
 推荐使用第二种
 
@@ -71,22 +72,22 @@ String content = parser.getContent(document);
     }
 
 >
-//使用时
- new WangyiParser();//此处为测试，故需要new出对象进行注册，实际环境中可以采用Spring扫面包将所有重写的解析类实例化（注册）
- String url = "http://news.163.com/15/0703/00/ATIEDCLF00014JB6.html";
- try {
+    //使用时
+    new WangyiParser();//此处为测试，故需要new出对象进行注册，实际环境中可以采用Spring扫面包将所有重写的解析类实例化（注册）
+    String url = "http://news.163.com/15/0703/00/ATIEDCLF00014JB6.html";
+    try {
         Document document = Jsoup.connect(url).get();
         Parser parser= ParserLocator.getInstance().getParser(url);
         String content = parser.getContent(document);
         System.out.println(content);
- } catch (IOException e) {
-     e.printStackTrace();
- }
+    } catch (IOException e) {
+    e.printStackTrace();
+    }
 
 
 XSExtractor尚未写完，还有很多其他问题需要解决，也欢迎大家献计献策。
 关于爬虫开发以及开源爬虫系统的研究，感兴趣的话可以加QQ群：235971260 （刚申请，还没多少人）
-一起讨论爬虫开发过程中遇到的问题，也欢迎HR们加入。
+一起讨论爬虫开发过程中遇到的问题，也欢迎HR们加入。   
 
 未完待续...
 
