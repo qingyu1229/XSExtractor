@@ -65,7 +65,7 @@ public class BasicParser implements Parser {
         if(path.endsWith(">p")){
             path=path.substring(0, path.length()-2);
         }
-        System.out.println(path);
+        //System.out.println(path);
         Element contentElement=body.select(path).first();
         return contentElement;
     }

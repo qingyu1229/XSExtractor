@@ -20,11 +20,26 @@ public class Test_BasicParser {
     @Test
     public void test1() {
         //http://www.cbrhq.gov.cn/Item/13014.aspx
-
+        new WangyiParser();
         //http://www.edai.com/news/xuetang/138124.html  抓取了多余的上一页下一页标签
-        //
 
+        String url = "http://news.163.com/15/0703/00/ATIEDCLF00014JB6.html";
+        try {
+            Document document = Jsoup.connect(url).get();
+            Parser parser= ParserLocator.getInstance().getParser(url);
+            //  BasicParser parser = new BasicParser();
+            String content = parser.getContent(document);
+            String text=parser.getContentText(document);
+            System.out.println(text);
+            FileUtils.write(new File("d:/textContent.html"), content, "gbk");
+            System.out.println(content);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    @Test
+    public void test3(){
         String url = "http://www.edai.com/news/xuetang/138124.html";
         try {
             Document document = Jsoup.connect(url).get();
@@ -36,6 +51,8 @@ public class Test_BasicParser {
             e.printStackTrace();
         }
     }
+
+
 
     @Test
     public void test2() {

@@ -28,12 +28,65 @@
 
 很明显，我们采用了第三种方案。
 
+XSExtractor是我从采集系统中分离出来的抽取器（做了一些改变），采用一种基于页面文本密度的算法进行抽取（具体算法的实现我以后会在我的博客中介绍，
+博客地址：[liangqingyu.com](http://www.liangqingyu.com)）。Html页面采用Jsoup进行格式化和结构化。希望能够帮助一部分人。
+具体使用方法：
+>
+//Document document = Jsoup.connect(url).get();
+//OR
+//Document document = Jsoup.parse(htmlStr);
+BasicParser parser = new BasicParser();
+String content = parser.getContent(document);
+//String text=parser.getContentText(document); //获取纯文本
+或者：
+>
+//Document document = Jsoup.connect(url).get();
+//OR
+//Document document = Jsoup.parse(htmlStr);
+Parser parser= ParserLocator.getInstance().getParser(url);
+String content = parser.getContent(document);
+//String text=parser.getContentText(document); //获取纯文本
+
+推荐使用第二种
+
+前面说过，任何一种算法都不能100%抽取准确，而实际商业生产环境中又不允许出现错误。于是，当某个网站的新闻采集不够准确时可以采用下面的处理方法。
+例如当采集网易新闻抓取不准确时：
+写一个叫WangyiParser的类，继承自BasicParser，重写BasicParser中定位正文的方法，同时在构造方法中将自己注册到ParserLocator中，如下：
+>
+ /**
+     * 假设现在抓取163的新闻时，不能够准确定位，
+     * 于是重写一个叫WangyiParser的类，继承自BasicParser，
+     * 重写BasicParser中定位正文的方法
+     */
+
+    public WangyiParser(){
+        //将自己注册到ParserLocator中
+        System.out.println("wangyi");
+        ParserLocator.getInstance().register("news.163.com",this);
+    }
+
+    @Override
+    public Element excavateContent(Document document) {
+        return document.getElementById("endText");
+    }
+
+>
+//使用时
+ new WangyiParser();//此处为测试，故需要new出对象进行注册，实际环境中可以采用Spring扫面包将所有重写的解析类实例化（注册）
+ String url = "http://news.163.com/15/0703/00/ATIEDCLF00014JB6.html";
+ try {
+        Document document = Jsoup.connect(url).get();
+        Parser parser= ParserLocator.getInstance().getParser(url);
+        String content = parser.getContent(document);
+        System.out.println(content);
+ } catch (IOException e) {
+     e.printStackTrace();
+ }
 
 
-
-
-
-
+XSExtractor尚未写完，还有很多其他问题需要解决，也欢迎大家献计献策。
+关于爬虫开发以及开源爬虫系统的研究，感兴趣的话可以加QQ群：235971260 （刚申请，还没多少人）
+一起讨论爬虫开发过程中遇到的问题，也欢迎HR们加入。
 
 未完待续...
 
