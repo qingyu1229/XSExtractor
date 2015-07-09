@@ -23,7 +23,7 @@ public class Test_BasicParser {
         new WangyiParser();
         //http://www.edai.com/news/xuetang/138124.html  抓取了多余的上一页下一页标签
 
-        String url = "http://news.163.com/15/0703/00/ATIEDCLF00014JB6.html";
+        String url = "http://ent.ifeng.com/a/20150709/42449855_0.shtml";
         try {
             Document document = Jsoup.connect(url).get();
             Parser parser= ParserLocator.getInstance().getParser(url);
